@@ -1,166 +1,115 @@
 # RISC-V-Processor-AHB-SoC-and-Multiple-peripherals-using-AHB-Bus
-# **AHB-Lite Bus Implementation & Verification**
+# RISC-V-32I-5-Stage-Pipeline-Core
+**5 stage pipeline implementation of RISC-V 32I Processor.**
 
-## Overview
-This project implements an **AMBA AHB-Lite** system consisting of:
-- A **Master**
-- An **AHB Decoder**
-- **Two Slaves** (with different coding styles and memory sizes)
+In this repository I have implemented 5 stage Pipelined processor which is actually the conversion of my previous single cycle implementation of processor into pipeline.
 
-![Our Implementation]![alt text](<ChatGPT Image Feb 13, 2026, 04_25_10 AM-1.png>)
 
-The goal is to:
-1. Understand and implement **AHB-Lite protocol fundamentals**
-2. Verify functionality across different transfer types
-3. Test **slave switching** via address decoding
-4. Explore **different coding styles** for slave design (RTL vs FSM)
+In case of pipelined implementation what we do is that we divide our instruction into multiple stages and in case of 5 stage pipelined implementation we will offcourse divide the instruction into 5 different stages. Five different stages are given as:
+- Instruction Fetch
+- Instruction Decode
+- Instruction Execution
+- Memory Read/Write
+- Write Back
 
----
+This pipelined implementation of processor supports six basic instructions:
+- R-Type
+- I-Type
+- S-Type
+- B-Type
+- J-Type
+- U-Type
 
-## About AHB-Lite
-**AHB-Lite** is a simplified version of the AMBA AHB protocol, designed for systems with a **single master**.  
-It is widely used in microcontrollers, SoCs, and embedded systems due to its:
-- **High-performance pipelined bus** (supporting address and data phases in parallel)
-- **Simple integration** for single-master designs
-- Support for **different transfer types** (Single, Incrementing Burst, Wrapping Burst, etc.)
-- Ability to **insert wait states** for slower slaves
+This RISC V 5 Stage pipeline Implementation does encounters hazards, and it has been surpassed by implementing a hazard unit to handle all types of hazards(Structural and Data Hazard). 
 
----
+# Implementation and Procedure 
 
-## Data Transfer in AHB-Lite
-Each AHB-Lite transfer consists of two **phases**:
+5 Stage pipeline requires a series of registers between the complete datapath, these registers will be responsible for tracking of instruction or different partss of instructions required by different modules. The instructions needs to be propogated into all five stages for the instruction to be executed correctly and with the help of these registers the corresponding instructions propogate or different parts of instructions accordingly. The datapath followed is mentioned below and is the extened version of same implemented single cycle datapath as tagged above. 
 
-- **Address Phase**  
-  The master places the **address**, **control signals**, and **transfer type** on the bus.
-  
-- **Data Phase**  
-  Data is transferred (read or write).  
-  Pipelining allows the **next address** to be issued while the current data phase is still active, increasing throughput.
+![block diagram](https://github.com/user-attachments/assets/42f3b097-bc33-449c-b613-3b0cdca62cc9)
 
-### **Common Transfer Types**
-- **Single Transfer** (`BURST = 0`): One data transfer only.
-- **Incrementing Burst** (`BURST = 1`): Multiple consecutive transfers, address increments after each.
-- **Wrapping Burst**: Address wraps within a defined boundary.
-- **Undefined Burst**: Burst length not predefined.
+# Discussions
 
----
+ **1. Fetch Cycle Datapath**
+ 
+The Fetch cycle is the first stage of instruction execution process. The main goal of the fetch cycle is to retrieve the next instruction from memory so        that it can be decoded and executed by the processor.
+     
+**2. Decode Cycle Datapath** 
 
-## Architecture
-In this project, we compare:
+The decode cycle in a is the second stage of instruction execution. The main objective of this stage is to interpret       the fetched instruction and prepare      the necessary inputs (registers, control signals) for subsequent stages.
 
-1. **Original AHB-Lite Documentation Structure**  
+**3. Execution Cycle Datapath**
 
-   ![Original Architecture](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/General_Archeticture.png)
+The Execution cycle is the third stage of instruction execution process. Its main role is to perform the arithmetic or logical   operation dictated by the          instruction, calculate memory addresses for load/store operations, or determine the outcome of a branch.
+    
+**4. Memory Read/Write Cycle Datapath**
 
-2. **Our Implementation**  
+The Memory Read or Write Cycle is the fourth stage of instruction execution process. This stage is responsible for interacting with data memory during load     or store instructions. If the instruction is not a memory operation, this stage is skipped, and the processor moves to the writeback stage.
 
-   ![Our Implementation](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/AHB_Lite_Archeticture.png)
+**5. Write Back Cycle Datapath**
 
-### **Key Points in Our Implementation**
-- **Processor Assumption**  
-  An external processor drives the master signals, simulating a real-world scenario.
-  
-- **PDONE Signal**  
-  Added to indicate a successful transaction from the master back to the processor.
-  
-- **Two-Slave Design**
-  - **Slave 1**: Larger memory, **regular RTL coding style**
-  - **Slave 2**: Smaller memory, **FSM coding style**, demonstrating multiple implementation approaches
-  
-- **AHB Decoder**  
-  Directs transfers to the correct slave based on address.
+The Writeback cycle is the fifth and final stage of instruction execution process. The main purpose of this stage is to write the result of an instruction (whether it be from an arithmetic operation or a memory load) back to the destination register.
 
----
+**Note: Hazard Unit**
 
-## 🔍 Verification Flow
-The verification strategy mimics a processor issuing transactions to test:
-1. **Single Transfers** with no wait states
-2. **Incrementing Bursts**
-3. **Transfers to Slave 1**
-4. **Transfers to Slave 2**
-5. **Slave Switching** between transactions
+**Hazard units** in a pipeline processor are responsible for detecting and resolving hazards that can occur when executing instructions in a pipelined         
+architecture. 
+**Hazards** can cause incorrect program execution or reduce performance by stalling the pipeline. 
+There are three primary types of hazards: **data hazards, control hazards, and structural hazards**. 
+In a 32-bit RISC-V 5-stage pipeline, **hazard detection and forwarding units** are critical components that help manage these hazards.
 
----
+**Structural Hazard**
+1. Hardware does not support the execution of instruction in same clock cycle.
+2. Without having Two memories RISC-V pipelining architecture will have structural hazard.
 
-### **Step 1 – Expected vs Actual Waveform: Single Transfer**
-- **Expected**:
-![Single Transfer Comparison](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Expected_Single_Write.png)
-- **Waveform**:
+**Data Hazard**
+1. Data to be executed is not available.
+2. May occur when pipeline is stalled.
+3. Solve by using forwarding or bypassing technique.
 
-![Single Transfer Comparison](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Generated_Single_Write.png)
+**Solution to Data Hazard.**
+1.Solving Data Hazards with nops
+2.Solving Data Hazard with Forwarding / Bypassing
 
-In previous comparison we observe:
-- In Write transfer: generated waveform matches the expected waveform in the AHB documentation
-- In Write Transfer: HADDR appears at cycle N, HWDATA at cycle N+1 and data is accessed be the salve at cycle N+2 exactly like the specs stated!
-- In Read Transfer: generated waveform matches the expected waveform in the AHB documentation
-- In Read Transfer: HADDR appears at cycle N and HRDATA at cycle N+1 exactly like the specs stated!
+The Data Hazard is solved using Forwarding/ Bypassing
 
----
+**Conditiion Table:**
+![Screenshot 2024-09-06 203221](https://github.com/user-attachments/assets/df426216-b65d-4fca-a8b4-4416f27851c8)
 
-### **Step 2 – Expected vs Actual Waveform: Incrementing Burst**
-- **Expected**:
-![Single Transfer Comparison](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Expected_Burst_Transfer.png)
-- **Writing Waveform**:
+**Condition for Data Hazard:**
 
-![Single Transfer Comparison](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Generated_Burst_Write.png)
-- **Reading Waveform**:
+![Screenshot 2024-09-06 203244](https://github.com/user-attachments/assets/1350b3e3-edb7-40ee-bf39-dd62a56339e2)
 
-![Single Transfer Comparison](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Generated_Burst_Read.png)
+**Hazard Architecture:**
 
-In previous comparison we observe:
--	In Write Transfer: generated waveform matches the expected waveform in the AHB documentation
--	In Write Transfer: HADDR appears at cycle N, HWDATA at cycle N+1 and data is accessed be the salve at cycle N+2 exactly like the specs stated!
--	As (HSIZE = 2’b01) this indicates that the transfer is 16 bit transfer so we notice that the address is incrementing by 2 every cycle!
--	In accessing memory, we see that we write 16 bits successfully in our memory in the N+3 cycle.
+![Screenshot 2024-09-06 203309](https://github.com/user-attachments/assets/4ff4a805-0982-40df-81b8-b5d112d0e71e)
 
--	In Read Transfer: generated waveform matches the expected waveform in the AHB documentation
--	In Read Transfer: HADDR appears at cycle N and HRDATA at cycle N+1 exactly like the specs stated!
--	As (HSIZE = 2’b10) this indicates that the transfer is 32 bit transfer so we notice that the address is incrementing by 4 every cycle!
--	You may ask, why the data read didn’t change as we read from two different addresses?! but the answer is that we actually wrote the same data in these two addresses.
+**Hazard Unit Waveform Explanation**
 
----
+![hazard exp](https://github.com/user-attachments/assets/65d8acc2-d5a8-4342-bfd3-aba943781752)
 
-### **Step 3 – Slave 1 Verification**
+**Note: The circled registers represents hazard unit**
 
-![Slave 1 Verification](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Slave1_Waveform.png)
+# Simulation Results and Tools Used
 
----
+The simulation has been in **Visual Studio** code with **Icarus Verilog environment**, which supports **gtkwave** for verilog simulaiton.
 
-### **Step 4 – Slave Switching Moment**
+**The Input Machine Learning Codes are present inside the mem.hexfile.**
 
-![Slave Switching](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Switching%20Moment.png)
+**Pipeline Simulation Waveform:**
 
----
+![pipeline waveform](https://github.com/user-attachments/assets/a2ff6866-87fa-4aa0-b489-59c82bb6be5b)
 
-### **Step 5 – Slave 2 Verification**
+**Note:** Download **Icarus Verilog** from:https://bleyer.org/icarus, after downloading in **CMD** type **iverilog**, you can see iverilog with gtkwave preinstalled.
 
-![Slave 2 Verification](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Slave2_Waveform.png)
+**Terminal code:**
 
----
+Eg: PS C:\Users\user\Desktop\Github projects\RISC_V_Single_Cycle_Core\Load Word I Type> **iverilog -o out.vvp .\pipeline_tb.v .\Pipeline_Top.v,**
+**vvp out.vvp,**
+**gtkwave.**
 
-## 📂 Additional Documentation
-For better understanding and deeper visualization of the design and verification process,  
-please refer to the [full documentation](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Documentation/AHB_Lite_Documentation.pdf) 
 
----
 
-## FPGA Flow using Vivado
-- **Elaboration**
-
-![Elaboration](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Elaboration.png)
-- **Synthesis**
-
-![Synthesis](https://github.com/MohamedHussein27/AMBA_AHB_Lite_with_two_slaves/blob/main/Strucutre%20%26%20Testing/Senthesis.png)
-
----
-
-## ✅ Conclusion
-- The design respects **address and data phase pipelining**
-- Both **single** and **incrementing burst** transfers are implemented and verified
-- The architecture allows for easy scaling to additional slaves or features
-- Multiple coding styles for slaves were demonstrated
-
----
 
 ## Contact Me!
 - [Email](mailto:Mohamed_Hussein2100924@outlook.com)
