@@ -100,14 +100,6 @@ The simulation has been in **Visual Studio** code with **Icarus Verilog environm
 
 ![pipeline waveform](https://github.com/user-attachments/assets/a2ff6866-87fa-4aa0-b489-59c82bb6be5b)
 
-**Note:** Download **Icarus Verilog** from:https://bleyer.org/icarus, after downloading in **CMD** type **iverilog**, you can see iverilog with gtkwave preinstalled.
-
-**Terminal code:**
-
-Eg: PS C:\Users\user\Desktop\Github projects\RISC_V_Single_Cycle_Core\Load Word I Type> **iverilog -o out.vvp .\pipeline_tb.v .\Pipeline_Top.v,**
-**vvp out.vvp,**
-**gtkwave.**
-
 <dr>
 # Multi-layer-AHB-lite
 # AHB-Lite Based SoC Design
