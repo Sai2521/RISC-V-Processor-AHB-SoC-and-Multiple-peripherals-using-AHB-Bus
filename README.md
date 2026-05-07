@@ -87,12 +87,15 @@ $$
 
 Branch penalty:
 
+Branch penalty:
+
 $$
 \text{Penalty} = \begin{cases}
 0 \text{ cycles} & \text{if prediction correct} \\
 2 \text{ cycles} & \text{if prediction incorrect}
 \end{cases}
 $$
+
 This RISC V 5 Stage pipeline Implementation does encounters hazards, and it has been surpassed by implementing a hazard unit to handle all types of hazards(Structural and Data Hazard). 
 
 # 4. Implementation and Procedure 
