@@ -168,6 +168,16 @@ Diagram was created using draw.io software.
 - Design Hazard Unit
 - Debug and verify
 
+## Results
+
+From figure 3, we observe a close resemblance of our design to the reference block diagram from which we started off in the beginning in figure 1.
+
+- **RTL Synthesis:** The design closely resembles the reference block diagram, demonstrating successful [RTL synthesis](/Assets/schematics.pdf).
+- **Timing Analysis:** The design meets timing requirements, with a maximum operating frequency of approximately 45 MHz.
+  <img src=".\Assets\time.png" alt="Alt Text" width="700">
+- **Resource Utilization:** The design utilizes hardware resources efficiently, with detailed breakdowns provided for logic elements, registers, memory blocks, and I/O resources (Basys 3, artix7).
+<img src=".\Assets\resource.png" alt="Alt Text" width="500">
+
 ## Critical Path
 
 <img src = "https://github.com/NAvi349/riscv-proc/blob/main/images/critical%20path.png">
