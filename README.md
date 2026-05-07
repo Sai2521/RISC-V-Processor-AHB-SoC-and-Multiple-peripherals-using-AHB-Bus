@@ -174,9 +174,10 @@ From figure 3, we observe a close resemblance of our design to the reference blo
 
 - **RTL Synthesis:** The design closely resembles the reference block diagram, demonstrating successful [RTL synthesis]<img width="1092" height="256" alt="time" src="https://github.com/user-attachments/assets/7934c156-6d57-4ee2-b214-fae6d586f405" />
 - **Timing Analysis:** The design meets timing requirements, with a maximum operating frequency of approximately 45 MHz.
-  <img src=".\Assets\time.png" alt="Alt Text" width="700">
+ 
 - **Resource Utilization:** The design utilizes hardware resources efficiently, with detailed breakdowns provided for logic elements, registers, memory blocks, and I/O resources (Basys 3, artix7).
-<img src=".\Assets\resource.png" alt="Alt Text" width="500">
+<img width="676" height="322" alt="resource" src="https://github.com/user-attachments/assets/afcfc024-e2d1-4d0d-ac80-d12a195c2ed5" />
+
 
 ## Critical Path
 
