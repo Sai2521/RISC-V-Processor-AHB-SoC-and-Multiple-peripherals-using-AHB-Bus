@@ -3,7 +3,7 @@
 **5 stage pipeline implementation of RISC-V 32I Processor.**
 
 In this repository I have implemented 5 stage Pipelined processor which is actually the conversion of my previous single cycle implementation of processor into pipeline.
-
+This is a complete implementation of a RISC-V RV32I five-stage pipelined CPU, supporting all 37 standard instructions with forwarding unit, hazard detection unit, and basic interrupt handling mechanisms.
 
 In case of pipelined implementation what we do is that we divide our instruction into multiple stages and in case of 5 stage pipelined implementation we will offcourse divide the instruction into 5 different stages. Five different stages are given as:
 - Instruction Fetch
@@ -20,9 +20,82 @@ This pipelined implementation of processor supports six basic instructions:
 - J-Type
 - U-Type
 
+### 2. Supported Instruction Set (RV32I - 37 Instructions)
+
+#### Arithmetic Instructions
+- `ADD`, `ADDI`, `SUB`
+- `SLT`, `SLTI`, `SLTU`, `SLTIU`
+
+#### Logical Instructions
+- `AND`, `ANDI`, `OR`, `ORI`, `XOR`, `XORI`
+
+#### Shift Instructions
+- `SLL`, `SLLI`, `SRL`, `SRLI`, `SRA`, `SRAI`
+
+#### Load/Store Instructions
+- `LB`, `LH`, `LW`, `LBU`, `LHU`
+- `SB`, `SH`, `SW`
+
+#### Branch Instructions
+- `BEQ`, `BNE`, `BLT`, `BGE`, `BLTU`, `BGEU`
+
+#### Jump Instructions
+- `JAL`, `JALR`
+
+#### Upper Immediate Instructions
+- `LUI`, `AUIPC`
+
+#### System Instructions
+- `FENCE` (treated as NOP)
+- `ECALL`, `EBREAK` (basic support)
+
+#### 3. Data Hazards
+
+**Forwarding Unit**
+- Resolves EX-EX and MEM-EX data hazards
+- Forwards data from EX/MEM pipeline register to EX stage
+- Forwards data from MEM/WB pipeline register to EX stage
+
+The forwarding logic can be expressed as:
+
+$$
+\text{operand} = \begin{cases}
+\text{EX/MEM result} & \text{if EX hazard detected} \\
+\text{MEM/WB result} & \text{if MEM hazard detected} \\
+\text{ID/EX operand} & \text{otherwise}
+\end{cases}
+$$
+
+**Hazard Detection Unit**
+- Detects Load-Use hazards
+- Inserts pipeline bubbles (stalls) when necessary
+- Maintains PC and IF/ID registers unchanged during stall
+
+Load-Use hazard detection condition:
+
+$$
+\text{Stall} = \text{ID/EX.MemRead} \land (\text{ID/EX.rd} \neq 0) \land 
+$$
+$$
+((\text{ID/EX.rd} = \text{IF/ID.rs1}) \lor (\text{ID/EX.rd} = \text{IF/ID.rs2}))
+$$
+
+#### Control Hazards
+- Simple "not-taken" branch prediction
+- Branch condition calculated in EX stage
+- Flushes IF and ID stages on misprediction
+
+Branch penalty:
+
+$$
+\text{Penalty} = \begin{cases}
+0 \text{ cycles} & \text{if prediction correct} \\
+2 \text{ cycles} & \text{if prediction incorrect}
+\end{cases}
+$$
 This RISC V 5 Stage pipeline Implementation does encounters hazards, and it has been surpassed by implementing a hazard unit to handle all types of hazards(Structural and Data Hazard). 
 
-# Implementation and Procedure 
+# 4. Implementation and Procedure 
 
 5 Stage pipeline requires a series of registers between the complete datapath, these registers will be responsible for tracking of instruction or different partss of instructions required by different modules. The instructions needs to be propogated into all five stages for the instruction to be executed correctly and with the help of these registers the corresponding instructions propogate or different parts of instructions accordingly. The datapath followed is mentioned below and is the extened version of same implemented single cycle datapath as tagged above. 
 
@@ -49,6 +122,37 @@ The Memory Read or Write Cycle is the fourth stage of instruction execution proc
 **5. Write Back Cycle Datapath**
 
 The Writeback cycle is the fifth and final stage of instruction execution process. The main purpose of this stage is to write the result of an instruction (whether it be from an arithmetic operation or a memory load) back to the destination register.
+
+### 5.Memory Interface
+
+- **Instruction Memory**: 32-bit address, 32-bit data, read-only
+- **Data Memory**: 32-bit address, 32-bit data, supports byte/half-word/word access
+
+## 6.Performance Metrics
+
+### Theoretical CPI (Cycles Per Instruction)
+
+$$
+\text{CPI}_{\text{ideal}} = 1.0
+$$
+
+$$
+\text{CPI}_{\text{actual}} = 1.0 + P_{\text{load-use}} \times 1 + P_{\text{branch}} \times 2 + P_{\text{interrupt}} \times N
+$$
+
+Where:
+- $P_{\text{load-use}}$: Probability of Load-Use hazard
+- $P_{\text{branch}}$: Probability of branch misprediction
+- $P_{\text{interrupt}}$: Probability of interrupt occurrence
+- $N$: Interrupt handling overhead
+
+### 7.Critical Paths
+
+1. **ALU Path**: Register Read → Forward MUX → ALU → Result
+2. **Branch Path**: Register Read → Forward MUX → Branch Comparator → PC Update
+3. **Memory Access Path**: ALU → Address Alignment → Memory Access → Data Alignment
+
+## 8. Design Details
 
 ### Table 1: RISC-V instruction types format.
 
