@@ -50,6 +50,27 @@ The Memory Read or Write Cycle is the fourth stage of instruction execution proc
 
 The Writeback cycle is the fifth and final stage of instruction execution process. The main purpose of this stage is to write the result of an instruction (whether it be from an arithmetic operation or a memory load) back to the destination register.
 
+### Table 1: RISC-V instruction types format.
+
+| Instruction | 31:25 | 24:20 | 19:15 | 14:12 | 11:7 | 6:0 |
+|-------------|-------|-------|-------|-------|------|-----|
+| R-type      | funct7| rs2   | rs1   | funct3| rd   | opcode |
+| I-type      | immediate[11:0] | rs1 | funct3 | rd | opcode |
+| S-type      | immediate[11:5] | rs2 | rs1 | funct3 | immediate[4:0] | opcode |
+| SB-type     | immediate[11:5] | rs2 | rs1 | funct3 | immediate[4:0] | opcode |
+| UJ-type     | immediate[11:0] | x   | x   | x     | x | x | x | x | x | x | x | x | opcode |
+
+### Table 2: RISC-V instruction types control signals.
+
+| Instruction | ALUSrc | Mem-to-Reg | Reg-Write | Mem-Read | Mem-Write | Branch | ALUOp1 | ALUOp0 |
+|-------------|--------|------------|-----------|----------|-----------|--------|--------|--------|
+| R-type      | 0      | 0          | 1         | 0        | 0         | 0      | 1      | 0      |
+| I-type      | 1      | 1          | 1         | 1        | 0         | 0      | 0      | 0      |
+| S-type      | 1      | X          | 0         | 0        | 1         | 0      | 0      | 0      |
+| SB-type     | 0      | X          | 0         | 0        | 0         | 1      | 0      | 1      |
+| UJ-type     | 1      | 0          | 1         | 0        | 0         | 1      | 1      | 1      |
+
+
 **Note: Hazard Unit**
 
 **Hazard units** in a pipeline processor are responsible for detecting and resolving hazards that can occur when executing instructions in a pipelined         
