@@ -87,8 +87,6 @@ $$
 
 Branch penalty:
 
-Branch penalty:
-
 $$
 \text{Penalty} = \begin{cases}
 0 \text{ cycles} & \text{if prediction correct} \\
